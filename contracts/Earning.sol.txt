@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Earning {
+    mapping(address => uint256) private organizationBalances;
+
+    event PaymentReceived(address indexed organization, address indexed student, uint256 amount);
+    event Withdrawal(address indexed organization, uint256 amount);
+
+    // Function to receive payments from students
+    function payOrganization(address organization) external payable {
+        require(msg.value > 0, "Payment amount should be greater than zero");
+        
+        // Update the organization's balance
+        organizationBalances[organization] += msg.value;
+        
+        emit PaymentReceived(organization, msg.sender, msg.value);
+    }
+    
+    // Function for organizations to withdraw their balance
+    function withdraw() external {
+        uint256 amount = organizationBalances[msg.sender];
+        require(amount > 0, "You Don't have any balance for withdrawal");
+        
+        // Update the organization's balance
+        organizationBalances[msg.sender] = 0;
+        
+        // Transfer the amount to the organization
+        payable(msg.sender).transfer(amount);
+        
+        emit Withdrawal(msg.sender, amount);
+    }
+    
+    // Function to check the balance of an organization
+    function getBalance(address organization) external view returns (uint256) {
+        return organizationBalances[organization];
+    }
+}

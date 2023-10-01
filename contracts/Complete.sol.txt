@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CourseContract {
+    struct Course {
+        uint256 courseId;
+        address author;
+        string title;
+        string details;
+        uint256 price;
+        string[] ipfsHashes;
+        address[] enrolledUsers;
+    }
+        mapping(uint256 => Course) public courses;
+    uint256 public courseIdCounter;
+event CourseCreated(uint256 courseId, address author);
+    event IPFSContentSent(uint256 courseId, address user);
+    function createCourse(
+        string memory title,
+        string memory details,
+        uint256 price,
+        string[] memory ipfsHashes
+    ) external {
+        require(price > 0, "Price must be greater than 0");
+        require(ipfsHashes.length > 0, "IPFS hashes array cannot be empty");
+
+        Course memory newCourse = Course({
+            courseId: courseIdCounter,
+            author: msg.sender,
+            title: title,
+            details: details,
+            price: price,
+            ipfsHashes: ipfsHashes,
+            enrolledUsers: new address[](0)
+        });
+
+        courses[courseIdCounter] = newCourse;
+        emit CourseCreated(courseIdCounter, msg.sender);
+
+        courseIdCounter++;
+    }
+      function enrollInCourse(uint256 courseId) external payable {
+        require(courseId < courseIdCounter, "Invalid courseId");
+        require(msg.value == courses[courseId].price, "Incorrect amount sent");
+
+        courses[courseId].enrolledUsers.push(msg.sender);
+    }
+    function sendIPFSContent(uint256 courseId) external view returns (string[] memory) {
+    require(courseId < courseIdCounter, "Invalid courseId");
+
+    bool isEnrolled = false;
+    for (uint256 i = 0; i < courses[courseId].enrolledUsers.length; i++) {
+        if (courses[courseId].enrolledUsers[i] == msg.sender) {
+            isEnrolled = true;
+            break;
+        }
+    }
+
+    require(isEnrolled, "You are not enrolled in this course");
+
+    return courses[courseId].ipfsHashes;
+}
+ function getCourseDetails(uint256 courseId)
+        external
+        view
+        returns (
+            address,
+            string memory,
+            string memory,
+            uint256,
+            string[] memory,
+            address[] memory
+        )
+    {
+        require(courseId < courseIdCounter, "Invalid courseId");
+
+        Course storage course = courses[courseId];
+        return (
+            course.author,
+            course.title,
+            course.details,
+            course.price,
+            course.ipfsHashes,
+            course.enrolledUsers
+        );
+    }
+    function getAllCourses() external view returns (Course[] memory) {
+        Course[] memory allCourses = new Course[](courseIdCounter);
+        for (uint256 i = 0; i < courseIdCounter; i++) {
+            allCourses[i] = courses[i];
+        }
+        return allCourses;
+    }
+}

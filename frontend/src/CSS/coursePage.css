@@ -1,0 +1,52 @@
+.card{
+    display: flex;
+    flex-direction: row;
+    box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+}
+p{
+    margin-bottom: 0;
+}
+.card-img{
+    flex-basis: 26%;
+
+}
+
+.heading{
+    font-size: 3rem;
+    font-weight: 700;
+}
+.course-details{
+    display: flex;
+    flex-direction: column;
+   justify-content:space-evenly;
+}
+.card-heading{
+    font-size: 1.8rem;
+    font-weight: 700;
+    
+}
+.course-author{
+    color: gray;
+}
+.other-detail{
+    color: gray;
+    margin-right: 0.5rem;
+}
+.bold-text{
+    
+}
+#price{
+    align-self: flex-start;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+.btn{
+    background-color: #bdc8d5;
+    width: 30%;
+}
+.btn:hover{
+    background-color: #68a4e8;
+  
+}
